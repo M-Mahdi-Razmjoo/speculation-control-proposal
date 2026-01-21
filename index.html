@@ -147,38 +147,67 @@ flowchart LR
             <h2>Experimental Setup</h2>
           </div>
           
-          <p>We validate the framework using <strong>gem5</strong> (Cycle-accurate simulator) comparing three baselines.</p>
+          <p>
+            We implement the ODU logic within the <strong>gem5 simulator (v23.0)</strong> using the <code>O3CPU</code> (Out-of-Order) model. 
+            The environment is configured to replicate a modern Intel Skylake-like microarchitecture, capable of deep speculation required to reproduce Spectre V1/V2 vulnerabilities.
+          </p>
 
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Configuration</th>
-                <th>Security</th>
-                <th>Performance</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code class="tag tag--red">Unsafe</code></td>
-                <td>Vulnerable</td>
-                <td>100% (Baseline)</td>
-                <td>Standard Out-of-Order execution.</td>
-              </tr>
-              <tr>
-                <td><code class="tag tag--yellow">Fences</code></td>
-                <td>Secure</td>
-                <td>~60%</td>
-                <td><code>LFENCE</code> inserted before every load.</td>
-              </tr>
-              <tr>
-                <td><code class="tag tag--green">ODU (Thesis)</code></td>
-                <td>Secure</td>
-                <td>Target >90%</td>
-                <td>Dynamic clamping based on risk.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="grid grid--2">
+            <div class="card">
+              <h3><span class="text-accent">01.</span> Microarchitecture Config</h3>
+              <p class="text-sm">Parameters chosen to ensure side-channel visibility (cache timing) and speculation window depth.</p>
+              <table class="data-table small-table">
+                <tr>
+                  <td><strong>Pipeline</strong></td>
+                  <td>8-wide fetch/decode/commit</td>
+                </tr>
+                <tr>
+                  <td><strong>ROB / LQ / SQ</strong></td>
+                  <td>192 entries / 72 loads / 56 stores</td>
+                </tr>
+                <tr>
+                  <td><strong>Branch Pred.</strong></td>
+                  <td>Tournament Predictor (Local/Global history)</td>
+                </tr>
+                <tr>
+                  <td><strong>L1 Cache</strong></td>
+                  <td>32KB (8-way), 4-cycle latency <span class="tag tag--red">Attack Target</span></td>
+                </tr>
+                <tr>
+                  <td><strong>L2 Cache</strong></td>
+                  <td>256KB (4-way), 12-cycle latency</td>
+                </tr>
+                <tr>
+                  <td><strong>Coherence</strong></td>
+                  <td>MESI Protocol (Critical for Flush+Reload)</td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="card">
+              <h3><span class="text-accent">02.</span> Workload Selection</h3>
+              <p class="text-sm">We segregate workloads to measure the two conflicting objectives of the thesis.</p>
+              <ul class="var-list">
+                <li>
+                  <strong>Security: Litmus Tests</strong><br>
+                  <span class="text-muted">Custom microbenchmarks derived from <em>Google Project Zero</em> and <em>Paul Kocher's</em> Spectre repository. These maximize leakage signal to stress-test the ODU's clamping logic.</span>
+                </li>
+                <li>
+                  <strong>Performance: SPEC CPU2017</strong><br>
+                  <span class="text-muted">Standard integer benchmarks (e.g., <code>gcc</code>, <code>mcf</code>) used to measure the IPC (Instructions Per Cycle) overhead of the ODU on benign code.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="callout" style="margin-top: 2rem;">
+            <strong>Comparative Baselines:</strong>
+            <ul class="comparison-list">
+              <li><code class="tag tag--red">Baseline (Unsafe)</code>: Standard O3CPU with no mitigation. Serves as the upper bound for performance (1.0x speedup) and lower bound for security (Max Leakage).</li>
+              <li><code class="tag tag--yellow">Static Fences</code>: <code>LFENCE</code> inserted by compiler before every load following a branch. Serves as the lower bound for performance (~0.6x speedup) and upper bound for security.</li>
+              <li><code class="tag tag--green">ODU (Proposed)</code>: Dynamic clamping. Goal: Converge to Unsafe performance while maintaining Fence-level security on critical gadgets.</li>
+            </ul>
+          </div>
         </section>
 
         <!-- Validation Code -->
@@ -188,91 +217,110 @@ flowchart LR
             <h2>Validation Methodology</h2>
           </div>
           <p>
-            Following the methodology of <em>Kocher et al. (Spectre)</em> and <em>Lipp et al. (Meltdown)</em>, we utilize a secret-dependent gadget to measure leakage rates.
+            Validation is performed via a <strong>Trace-Driven Analysis</strong>. We first confirm that the unmodified simulator leaks the secret key via Flush+Reload (High SNR). We then enable the ODU and measure the reduction in <strong>Transmission Rate (Bits/Sec)</strong> versus the <strong>IPC degradation</strong>.
           </p>
 
           <!-- Tabbed Code Interface -->
           <div class="code-tabs">
             <div class="tabs-header">
-              <button class="tab-btn active" onclick="openTab(event, 'c1')">Victim Gadget (Spectre V1)</button>
-              <button class="tab-btn" onclick="openTab(event, 'c2')">gem5 Implementation (C++)</button>
-              <button class="tab-btn" onclick="openTab(event, 'c3')">Attack / Measure (C)</button>
+              <button class="tab-btn active" onclick="openTab(event, 'c1')">1. The Gadget (User Space)</button>
+              <button class="tab-btn" onclick="openTab(event, 'c2')">2. The Attack (Measurement)</button>
+              <button class="tab-btn" onclick="openTab(event, 'c3')">3. The Defense (gem5 Fetch)</button>
             </div>
 
             <!-- Tab 1: The Victim -->
             <div id="c1" class="tab-content active">
               <pre><code class="language-c">
-// The classic Spectre V1 gadget (Listing 1 from paper)
-// The ODU must detect the risk here and STALL execution.
+/**
+ * SPECTRE VARIANT 1 GADGET
+ * Adapted from Kocher et al. (2019)
+ * 
+ * Scenario: Attacker mistrains branch predictor to assume (x < array1_size).
+ * ODU Goal: Detect that 'array1[x]' is a dependent load with High Gain (Cache Miss)
+ * and Low Confidence (Branch History), then clamp before 'array2' access.
+ */
 
 void victim_function(size_t x) {
     if (x < array1_size) {
-        // ODU Analysis:
-        // 1. Branch Predictor: Low Confidence (π) due to mistraining
-        // 2. Load array2: High Latency (Cache Miss) -> High Gain (G)
-        // 3. Instruction: Dependent Load -> High Leakage (L)
-        // RESULT: π*G < (1-π)*L  ==> STALL
+        // <--- ODU DECISION POINT
+        // Hardware Confidence (π) < 0.9 (Mistrained)
+        // Leakage Potential (L) = High (Index used in subsequent load)
         
+        // This line loads the secret into L1 Cache if speculated:
         temp &= array2[array1[x] * 512];
     }
 }
               </code></pre>
             </div>
 
-            <!-- Tab 2: gem5 Implementation -->
+            <!-- Tab 2: The Attack -->
             <div id="c2" class="tab-content">
-              <pre><code class="language-cpp">
-// Pseudocode for ODU logic inside gem5 FetchUnit.cpp
+              <pre><code class="language-c">
+/**
+ * FLUSH + RELOAD MEASUREMENT
+ * We measure the 'Transmission Rate' of the side channel.
+ * A successful ODU defense results in a bitrate of 0 (Noise).
+ */
 
-bool FetchUnit::checkRisk(DynInstPtr inst) {
-    // 1. Get Hardware Confidence (0.0 to 1.0)
-    float pi = branchPred->getConfidence(inst->pc);
+void measure_leakage() {
+    // 1. PRIME: Flush the probe array from cache hierarchy
+    for (i = 0; i < 256; i++) {
+        _mm_clflush(&array2[i * 512]);
+    }
 
-    // 2. Get Static Leakage Cost (from ISA extension/Annotation)
-    float L = inst->staticInst->getLeakageLevel(); 
+    // 2. TRIGGER: Call victim with malicious index
+    // If ODU works, the speculative access to array2 is squashed early.
+    victim_function(malicious_x);
 
-    // 3. Estimate Gain (Check if address likely in Cache)
-    float G = cache->isLikelyHit(inst->addr) ? LOW_GAIN : HIGH_GAIN;
-
-    // 4. The Inequality (Log Domain)
-    // odds = log(pi / (1-pi))
-    // cost = log(L / G)
-    
-    if (LUT_odds[pi] > (LUT_leak[L] - LUT_gain[G])) {
-        return true; // Speculate
-    } else {
-        stats.oduStalls++; // Record metric
-        return false; // Stall/Clamp
+    // 3. PROBE: Measure reload times
+    for (i = 0; i < 256; i++) {
+        uint64_t start = __rdtscp(&junk);
+        junk = array2[i * 512]; 
+        uint64_t delta = __rdtscp(&junk) - start;
+        
+        // If fast (< 80 cycles), it was cached -> LEAK
+        if (delta <= CACHE_HIT_THRESHOLD) {
+             results[i]++; 
+        }
     }
 }
               </code></pre>
             </div>
 
-            <!-- Tab 3: Measurement -->
+            <!-- Tab 3: The Defense -->
             <div id="c3" class="tab-content">
-              <pre><code class="language-c">
-// Measuring Leakage Rate (Based on Spectre Listing 5)
-// We run this on gem5. 
-// Success = 'results[mix_i]' remains 0 (ODU blocked it).
+              <pre><code class="language-cpp">
+/**
+ * GEM5 FETCH UNIT MODIFICATION (Pseudo-C++)
+ * Located in: src/cpu/o3/fetch.cc
+ * 
+ * We intercept the instruction fetch. If Risk > Utility, we issue
+ * a 'pipeline bubble' (Stall) instead of the instruction.
+ */
 
-void measure_leakage() {
-    for (i = 0; i < 256; i++) {
-        // Flush cache line
-        _mm_clflush(&array2[i * 512]);
-    }
+bool FetchUnit::checkRiskPolicy(DynInstPtr inst) {
+    // 1. Extract Hardware State
+    // We query the Tournament Predictor's local history table
+    double pi = branchPred->getConfidence(inst->pc); 
+    
+    // 2. Extract Semantic Cost (Static Analysis Tag)
+    // 0 = Benign (ADD), 1 = Transmitter (Dependent Load)
+    double L = inst->staticInst->getLeakageClass(); 
 
-    // Call Victim (which ODU should protect)
-    victim_function(malicious_x);
+    // 3. Calculate Gain Estimate
+    // Check MSHR (Miss Status Holding Register) for L1 status
+    double G = dcache->isLikelyHit(inst->addr) ? 1.0 : 100.0;
 
-    // Reload and Time
-    for (i = 0; i < 256; i++) {
-        time = __rdtscp(&junk);
-        junk = array2[i * 512]; 
-        delta = __rdtscp(&junk) - time;
-        
-        if (delta <= CACHE_HIT_THRESHOLD) {
-             results[i]++; // LEAK DETECTED
-        }
+    // 4. Log-Domain Inequality Check (Avoids Division)
+    // LUTs are precomputed at compile time
+    double risk_val = LUT_Log[L] - LUT_Log[G];
+    double odds_val = LUT_LogOdds[pi]; // log(pi / 1-pi)
+
+    if (odds_val > risk_val) {
+        return true; // Safe to Speculate
+    } else {
+        DPRINTF(ODU, "Clamping speculation at PC: %x\n", inst->pc);
+        return false; // Insert Pipeline Stall
     }
 }
               </code></pre>
