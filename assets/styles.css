@@ -126,7 +126,7 @@ h1, h2, h3 { color: #fff; margin: 0; }
 
 /* Diagram */
 .diagram-container {
-  background: #ffffff; /* Mermaid needs light bg usually, or configured dark */
+  background: #ffffff; 
   padding: 2rem;
   border-radius: 8px;
   display: flex;
@@ -155,6 +155,21 @@ h1, h2, h3 { color: #fff; margin: 0; }
 .tag--yellow { background: rgba(210, 153, 34, 0.15); color: #d29922; }
 .tag--green { background: rgba(56, 139, 253, 0.15); color: #58a6ff; }
 
+/* Callout for comparisons */
+.callout {
+  background: var(--sidebar);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.comparison-list {
+  padding-left: 1.2rem;
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+}
+.comparison-list li { margin-bottom: 0.5rem; }
+
 /* Code Tabs */
 .code-tabs {
   border: 1px solid var(--border);
@@ -166,6 +181,7 @@ h1, h2, h3 { color: #fff; margin: 0; }
   display: flex;
   background: var(--sidebar);
   border-bottom: 1px solid var(--border);
+  overflow-x: auto;
 }
 .tab-btn {
   background: none; border: none;
@@ -175,13 +191,13 @@ h1, h2, h3 { color: #fff; margin: 0; }
   font-size: 0.8rem;
   cursor: pointer;
   border-right: 1px solid var(--border);
+  white-space: nowrap;
 }
 .tab-btn:hover { color: #fff; }
 .tab-btn.active { color: var(--accent); background: #1f242c; }
 
 .tab-content { display: none; background: #0d1117; }
 .tab-content.active { display: block; }
-/* Override Prism styles slightly */
 pre[class*="language-"] { margin: 0 !important; border-radius: 0 !important; border: none !important; }
 
 /* Timeline */
