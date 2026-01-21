@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function() {
   if (window.mermaid) {
     mermaid.initialize({ 
       startOnLoad: true, 
-      theme: 'neutral', // Better contrast for diagrams
+      theme: 'neutral', 
       securityLevel: 'loose'
     });
   }
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 
-  // 3. Tab Logic
+  // 3. Tab Logic for Code Blocks
   window.openTab = function(evt, tabName) {
     var i, tabcontent, tablinks;
     
