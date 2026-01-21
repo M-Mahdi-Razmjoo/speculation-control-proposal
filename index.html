@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Risk-Aware Speculation Control — Project Page</title>
+  <meta name="description" content="Research project page: threat model, literature overview, proposed methodology, planned experiments, reproducibility, and artifacts." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Risk-Aware Speculation Control — Project Page" />
+  <meta property="og:description" content="Methodology + planned experiments + reproducibility for a thesis project." />
+  <meta property="og:type" content="website" />
+
+  <link rel="stylesheet" href="assets/styles.css" />
+
+  <!-- Optional: KaTeX for math (CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Optional: Mermaid for diagrams (CDN) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <script defer src="assets/app.js"></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <div class="brand">
+        <div class="brand__mark">⟡</div>
+        <div class="brand__text">
+          <div class="brand__title">Risk-Aware Speculation Control</div>
+          <div class="brand__subtitle">Implementation + planned experiments (not guaranteed)</div>
+        </div>
+      </div>
+
+      <div class="topbar__actions">
+        <button id="themeToggle" class="btn btn--ghost" type="button" aria-label="Toggle theme">
+          <span class="btn__icon" aria-hidden="true">🌓</span>
+          <span class="btn__text">Theme</span>
+        </button>
+        <a class="btn btn--primary" href="#artifacts">Artifacts</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar navigation -->
+    <aside class="sidebar" aria-label="Section navigation">
+      <div class="sidebar__inner">
+        <nav class="nav">
+          <a class="nav__item" href="#overview">Overview</a>
+          <a class="nav__item" href="#claims">Core claim</a>
+          <a class="nav__item" href="#method">Methodology</a>
+          <a class="nav__item" href="#design">System design</a>
+          <a class="nav__item" href="#experiments">Planned experiments</a>
+          <a class="nav__item" href="#metrics">Metrics & analysis</a>
+          <a class="nav__item" href="#repro">Reproducibility</a>
+          <a class="nav__item" href="#timeline">Timeline</a>
+          <a class="nav__item" href="#risks">Risks & limitations</a>
+          <a class="nav__item" href="#artifacts">Artifacts</a>
+          <a class="nav__item" href="#refs">References</a>
+        </nav>
+
+        <div class="sidebar__card">
+          <div class="pill">Status</div>
+          <p class="muted">
+            This page documents <strong>planned</strong> implementation and experiments.
+            It does <strong>not</strong> guarantee outcomes.
+          </p>
+          <div class="legend">
+            <span class="dot dot--planned"></span> Planned
+            <span class="dot dot--wip"></span> In progress
+            <span class="dot dot--done"></span> Completed
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main id="main" class="content">
+      <div class="container">
+        <!-- Hero -->
+        <section class="hero" id="overview">
+          <div class="hero__text">
+            <h1>Project page</h1>
+            <p class="lead">
+              A practical, thesis-friendly plan to implement and evaluate a
+              <strong>risk-aware speculation control policy</strong> that trades expected performance gain vs. leakage cost.
+            </p>
+
+            <div class="callout callout--note">
+              <strong>Note:</strong> This page is intentionally detailed (scenarios, code structure, experiments) to keep your
+              written proposal short (~5 pages) while still documenting rigor.
+            </div>
+
+            <div class="chips">
+              <span class="chip">Side-channel security</span>
+              <span class="chip">Transient execution</span>
+              <span class="chip">Decision-theoretic control</span>
+              <span class="chip">Reproducible evaluation</span>
+            </div>
+          </div>
+
+          <div class="hero__card">
+            <div class="mini-metric">
+              <div class="mini-metric__k">Focus</div>
+              <div class="mini-metric__v">Policy + evaluation plan</div>
+            </div>
+            <div class="mini-metric">
+              <div class="mini-metric__k">Deliverables</div>
+              <div class="mini-metric__v">Prototype + results + write-up</div>
+            </div>
+            <div class="mini-metric">
+              <div class="mini-metric__k">Guarantees</div>
+              <div class="mini-metric__v">None (reasonable design)</div>
+            </div>
+
+            <hr class="sep" />
+
+            <div class="quicklinks">
+              <a class="link" href="#experiments">Jump to experiments →</a>
+              <a class="link" href="#repro">Jump to reproducibility →</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Core claim -->
+        <section class="section" id="claims">
+          <h2>Core claim (what you are testing)</h2>
+          <div class="grid grid--2">
+            <div class="card">
+              <h3>Hypothesis</h3>
+              <p>
+                A runtime policy that permits speculation only when the <em>expected utility</em> is positive
+                can reduce exploitable leakage in high-risk regions while preserving most performance in low-risk regions.
+              </p>
+              <div class="callout callout--warn">
+                <strong>Important:</strong> results depend on the evaluation platform, workload selection, and leakage proxy quality.
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Decision rule (math)</h3>
+              <p class="muted">Rendered using KaTeX (optional).</p>
+              <div class="math">
+                \(E[U(I_t)] = \pi(t)\cdot G(I_t) - (1-\pi(t))\cdot L(I_t)\)
+              </div>
+              <div class="math">
+                Continue iff \( \pi(t)G(I_t) > (1-\pi(t))L(I_t) \)
+              </div>
+              <p class="muted">
+                \(\pi(t)\): confidence, \(G\): gain estimate, \(L\): leakage cost (semantic / analysis-derived).
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Methodology -->
+        <section class="section" id="method">
+          <h2>Proposed methodology</h2>
+
+          <div class="grid grid--3">
+            <div class="card">
+              <div class="pill">Step 1</div>
+              <h3>Define leakage-cost levels</h3>
+              <p>
+                Use a small discrete set (e.g., 2–4 levels: low/med/high/critical) based on
+                program semantics (secret-dependent loads, transmitter gadgets, etc.).
+              </p>
+              <ul class="list">
+                <li>Start coarse (thesis-feasible).</li>
+                <li>Refine later if time permits.</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <div class="pill">Step 2</div>
+              <h3>Map predictor state → confidence bins</h3>
+              <p>
+                Approximate \(\pi(t)\) from predictor metadata (e.g., saturating counters).
+                Calibration can be simple and monotonic.
+              </p>
+              <ul class="list">
+                <li>No need for perfect probability.</li>
+                <li>Just consistent confidence ordering.</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <div class="pill">Step 3</div>
+              <h3>Enforce the inequality cheaply</h3>
+              <p>
+                Avoid division. Use LUT/quantization or log-domain comparison in a small “ODU” unit.
+              </p>
+              <ul class="list">
+                <li>Output: speculate / clamp / stall.</li>
+                <li>Goal: minimal critical-path impact.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>System sketch (diagram)</h3>
+            <p class="muted">Mermaid diagram (optional). If Mermaid doesn’t render, it will still display as text.</p>
+
+            <pre class="mermaid">
+flowchart LR
+  A[Compiler / Annotator] -->|L(It) metadata| B[Binary / ISA]
+  B --> C[CPU Front-end]
+  C --> D[ODU: odds decision unit]
+  D -->|speculate| E[Continue fetch]
+  D -->|clamp/stall| F[Limit speculation depth]
+  C -->|predictor state| D
+            </pre>
+          </div>
+        </section>
+
+        <!-- Design -->
+        <section class="section" id="design">
+          <h2>Implementation design (what you will build)</h2>
+
+          <div class="grid grid--2">
+            <div class="card">
+              <h3>Prototype target (choose one)</h3>
+              <ul class="list">
+                <li><strong>Simulator-based</strong> (recommended for master’s): implement policy in a CPU simulator model.</li>
+                <li><strong>Analytical model</strong>: trace-driven evaluation with leakage/performance proxies.</li>
+                <li><strong>FPGA/RTL</strong> (only if already available): tiny ODU + hooks.</li>
+              </ul>
+              <div class="callout callout--note">
+                For a 5-page proposal, state one main target and keep others as “future work”.
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Repository layout (suggested)</h3>
+              <pre class="codeblock"><code>/
+  docs/                # this website (optional if you use /docs for pages)
+  src/
+    policy/            # utility rule, thresholds, LUTs
+    workloads/         # microbenchmarks / gadgets
+    metrics/           # leakage proxy + perf analysis
+  scripts/
+    run_all.sh         # reproducible pipeline
+  results/
+    figures/ tables/
+  README.md</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Experiments -->
+        <section class="section" id="experiments">
+          <h2>Planned experiments</h2>
+
+          <div class="toolbar">
+            <div class="toolbar__left">
+              <span class="muted">Filter:</span>
+              <button class="btn btn--chip is-active" data-filter="all" type="button">All</button>
+              <button class="btn btn--chip" data-filter="planned" type="button">Planned</button>
+              <button class="btn btn--chip" data-filter="wip" type="button">In progress</button>
+              <button class="btn btn--chip" data-filter="done" type="button">Completed</button>
+            </div>
+            <div class="toolbar__right muted">
+              Keep experiments “reasonable” — no guarantees.
+            </div>
+          </div>
+
+          <div class="grid grid--2" id="expGrid">
+            <article class="card exp" data-status="planned">
+              <div class="exp__head">
+                <span class="badge badge--planned">Planned</span>
+                <h3>Exp 1 — Baseline vs policy: perf overhead</h3>
+              </div>
+              <p>Compare default speculation vs utility-controlled speculation on representative workloads.</p>
+              <ul class="list">
+                <li>Independent variables: thresholding, L-level granularity</li>
+                <li>Outputs: IPC, cycles, branch MPKI (if available)</li>
+              </ul>
+            </article>
+
+            <article class="card exp" data-status="planned">
+              <div class="exp__head">
+                <span class="badge badge--planned">Planned</span>
+                <h3>Exp 2 — Leakage proxy reduction on microbenchmarks</h3>
+              </div>
+              <p>Use Spectre-like gadgets / secret-dependent access patterns and measure a leakage proxy.</p>
+              <ul class="list">
+                <li>Proxy examples: distinguishability / success rate in a simplified attacker model</li>
+                <li>Outputs: “leakage score” vs slowdown tradeoff</li>
+              </ul>
+            </article>
+
+            <article class="card exp" data-status="planned">
+              <div class="exp__head">
+                <span class="badge badge--planned">Planned</span>
+                <h3>Exp 3 — Sensitivity: mapping π(t) bins</h3>
+              </div>
+              <p>Check robustness to different confidence mappings (coarse vs fine bins).</p>
+              <ul class="list">
+                <li>Does behavior stay stable?</li>
+                <li>Where does it over-stall?</li>
+              </ul>
+            </article>
+
+            <article class="card exp" data-status="planned">
+              <div class="exp__head">
+                <span class="badge badge--planned">Planned</span>
+                <h3>Exp 4 — Ablation: static cap vs adaptive policy</h3>
+              </div>
+              <p>Compare to a simple fixed speculation-depth cap baseline.</p>
+              <ul class="list">
+                <li>Goal: show Pareto improvement (less leakage for same perf, or vice versa)</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="callout callout--note">
+            <strong>Tip:</strong> In your 5-page proposal, include only 2–3 “main experiments”. Keep the rest on this page.
+          </div>
+        </section>
+
+        <!-- Metrics -->
+        <section class="section" id="metrics">
+          <h2>Metrics & analysis</h2>
+
+          <div class="grid grid--2">
+            <div class="card">
+              <h3>Performance metrics</h3>
+              <ul class="list">
+                <li>Slowdown / IPC / CPI</li>
+                <li>Branch misprediction rate (if available)</li>
+                <li>Stall frequency due to policy</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Security / leakage proxies</h3>
+              <ul class="list">
+                <li>Distinguishability between secret classes</li>
+                <li>Attacker success rate in simplified model</li>
+                <li>Information-flow inspired scores (where feasible)</li>
+              </ul>
+              <p class="muted">
+                These are proxies: useful for comparison, not absolute guarantees.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Reproducibility -->
+        <section class="section" id="repro">
+          <h2>Reproducibility</h2>
+
+          <div class="grid grid--2">
+            <div class="card">
+              <h3>One-command pipeline (goal)</h3>
+              <pre class="codeblock"><code># Example (you will replace with your real command)
+./scripts/run_all.sh --workloads "microbench,spec-lite" --policy utility</code></pre>
+              <ul class="list">
+                <li>Deterministic seeds where possible</li>
+                <li>Results saved to <code>results/</code></li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Environment capture</h3>
+              <ul class="list">
+                <li><code>requirements.txt</code> / <code>environment.yml</code></li>
+                <li>Container (optional): <code>Dockerfile</code></li>
+                <li>Document CPU/simulator version + flags</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Timeline -->
+        <section class="section" id="timeline">
+          <h2>Timeline</h2>
+          <div class="timeline">
+            <div class="timeline__item">
+              <div class="timeline__when">Week 1–2</div>
+              <div class="timeline__what">Finalize scope, implement policy skeleton, set baseline</div>
+            </div>
+            <div class="timeline__item">
+              <div class="timeline__when">Week 3–5</div>
+              <div class="timeline__what">Implement L levels + π bins, run Exp 1–2</div>
+            </div>
+            <div class="timeline__item">
+              <div class="timeline__when">Week 6–8</div>
+              <div class="timeline__what">Sensitivity + ablation (Exp 3–4), prepare figures</div>
+            </div>
+            <div class="timeline__item">
+              <div class="timeline__when">Final</div>
+              <div class="timeline__what">Write thesis + polish repo + final report</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Risks -->
+        <section class="section" id="risks">
+          <h2>Risks & limitations</h2>
+          <div class="grid grid--2">
+            <div class="card">
+              <h3>Main risks</h3>
+              <ul class="list">
+                <li>L(It) may be coarse → start with bins; evaluate sensitivity</li>
+                <li>π(t) calibration imperfect → use monotonic confidence bins</li>
+                <li>Over-stalling → tune thresholds, show Pareto curves</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Non-goals</h3>
+              <ul class="list">
+                <li>Not a full industrial-grade mitigation</li>
+                <li>Not proving absolute security</li>
+                <li>Not covering every side-channel</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Artifacts -->
+        <section class="section" id="artifacts">
+          <h2>Artifacts</h2>
+          <div class="grid grid--3">
+            <div class="card">
+              <h3>Code</h3>
+              <p>Policy, workloads, metrics, scripts.</p>
+              <a class="btn btn--ghost" href="#" onclick="return false;">Link (add)</a>
+            </div>
+            <div class="card">
+              <h3>Results</h3>
+              <p>Figures, tables, logs.</p>
+              <a class="btn btn--ghost" href="#" onclick="return false;">Link (add)</a>
+            </div>
+            <div class="card">
+              <h3>Docs</h3>
+              <p>How to run, how to reproduce, assumptions.</p>
+              <a class="btn btn--ghost" href="#" onclick="return false;">Link (add)</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- References -->
+        <section class="section" id="refs">
+          <h2>References</h2>
+          <div class="card">
+            <ul class="refs">
+              <li>Spectre & Meltdown foundational papers (add full bib entries)</li>
+              <li>Quantifying information flow (info-theoretic framing)</li>
+              <li>SVF / Metior / other evaluation frameworks (as used)</li>
+            </ul>
+            <p class="muted">Tip: keep this short on the website; link to your BibTeX in the repo.</p>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <p class="muted">
+            © <span id="year"></span> — Project page for thesis planning. No guarantees; designed for transparency and reproducibility.
+          </p>
+        </footer>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
