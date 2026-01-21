@@ -4,467 +4,308 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Risk-Aware Speculation Control — Project Page</title>
-  <meta name="description" content="Research project page: threat model, literature overview, proposed methodology, planned experiments, reproducibility, and artifacts." />
+  <title>Risk-Aware Speculation Control</title>
+  <meta name="description" content="Master's Thesis Proposal: A Risk-Aware Control Framework for Secure Microarchitecture." />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Risk-Aware Speculation Control — Project Page" />
-  <meta property="og:description" content="Methodology + planned experiments + reproducibility for a thesis project." />
-  <meta property="og:type" content="website" />
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="assets/styles.css" />
-
-  <!-- Optional: KaTeX for math (CDN) -->
+  <!-- KaTeX for Math -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 
-  <!-- Optional: Mermaid for diagrams (CDN) -->
+  <!-- Mermaid for Diagrams -->
   <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
+  <!-- Prism for Code Highlighting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+  <link rel="stylesheet" href="assets/styles.css" />
   <script defer src="assets/app.js"></script>
 </head>
 
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-
-  <header class="topbar">
-    <div class="container topbar__inner">
-      <div class="brand">
-        <div class="brand__mark">⟡</div>
-        <div class="brand__text">
-          <div class="brand__title">Risk-Aware Speculation Control</div>
-          <div class="brand__subtitle">Implementation + planned experiments (not guaranteed)</div>
-        </div>
-      </div>
-
-      <div class="topbar__actions">
-        <button id="themeToggle" class="btn btn--ghost" type="button" aria-label="Toggle theme">
-          <span class="btn__icon" aria-hidden="true">🌓</span>
-          <span class="btn__text">Theme</span>
-        </button>
-        <a class="btn btn--primary" href="#artifacts">Artifacts</a>
-      </div>
-    </div>
-  </header>
-
   <div class="layout">
-    <!-- Sidebar navigation -->
-    <aside class="sidebar" aria-label="Section navigation">
-      <div class="sidebar__inner">
-        <nav class="nav">
-          <a class="nav__item" href="#overview">Overview</a>
-          <a class="nav__item" href="#claims">Core claim</a>
-          <a class="nav__item" href="#method">Methodology</a>
-          <a class="nav__item" href="#design">System design</a>
-          <a class="nav__item" href="#experiments">Planned experiments</a>
-          <a class="nav__item" href="#metrics">Metrics & analysis</a>
-          <a class="nav__item" href="#repro">Reproducibility</a>
-          <a class="nav__item" href="#timeline">Timeline</a>
-          <a class="nav__item" href="#risks">Risks & limitations</a>
-          <a class="nav__item" href="#artifacts">Artifacts</a>
-          <a class="nav__item" href="#refs">References</a>
-        </nav>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <div class="brand">ODU<span class="brand__dot">.</span>Frame</div>
+        <div class="author">Mohammad Mahdi Razmjoo</div>
+        <div class="date">Jan 2026 • M.Sc. Thesis</div>
+      </div>
+      
+      <nav class="nav">
+        <a class="nav__item" href="#abstract">01 // Abstract</a>
+        <a class="nav__item" href="#logic">02 // Core Logic</a>
+        <a class="nav__item" href="#architecture">03 // Architecture</a>
+        <a class="nav__item" href="#setup">04 // Exp. Setup</a>
+        <a class="nav__item" href="#validation">05 // Validation Code</a>
+        <a class="nav__item" href="#plan">06 // Timeline</a>
+      </nav>
 
-        <div class="sidebar__card">
-          <div class="pill">Status</div>
-          <p class="muted">
-            This page documents <strong>planned</strong> implementation and experiments.
-            It does <strong>not</strong> guarantee outcomes.
-          </p>
-          <div class="legend">
-            <span class="dot dot--planned"></span> Planned
-            <span class="dot dot--wip"></span> In progress
-            <span class="dot dot--done"></span> Completed
-          </div>
-        </div>
+      <div class="sidebar__footer">
+        <a href="#" class="btn btn--ghost">Download PDF</a>
       </div>
     </aside>
 
-    <!-- Main -->
-    <main id="main" class="content">
+    <!-- Main Content -->
+    <main class="content">
       <div class="container">
+        
         <!-- Hero -->
-        <section class="hero" id="overview">
-          <div class="hero__text">
-            <h1>Project page</h1>
-            <p class="lead">
-              A practical, thesis-friendly plan to implement and evaluate a
-              <strong>risk-aware speculation control policy</strong> that trades expected performance gain vs. leakage cost.
-            </p>
-
-            <div class="callout callout--note">
-              <strong>Note:</strong> This page is intentionally detailed (scenarios, code structure, experiments) to keep your
-              written proposal short (~5 pages) while still documenting rigor.
+        <section id="abstract" class="section hero">
+          <h1 class="hero__title">A Risk-Aware Control Framework <br> <span class="text-gradient">for Secure Microarchitecture</span></h1>
+          <p class="hero__lead">
+            Moving from binary "Stop/Go" policies to a probabilistic <strong>Risk/Reward</strong> model. 
+            We propose an <strong>Optimal Decision Unit (ODU)</strong> that permits speculation only when the expected utility is positive.
+          </p>
+          
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-card__label">Target</span>
+              <span class="stat-card__val">Spectre V1/V2</span>
             </div>
-
-            <div class="chips">
-              <span class="chip">Side-channel security</span>
-              <span class="chip">Transient execution</span>
-              <span class="chip">Decision-theoretic control</span>
-              <span class="chip">Reproducible evaluation</span>
+            <div class="stat-card">
+              <span class="stat-card__label">Simulator</span>
+              <span class="stat-card__val">gem5 (O3)</span>
             </div>
-          </div>
-
-          <div class="hero__card">
-            <div class="mini-metric">
-              <div class="mini-metric__k">Focus</div>
-              <div class="mini-metric__v">Policy + evaluation plan</div>
-            </div>
-            <div class="mini-metric">
-              <div class="mini-metric__k">Deliverables</div>
-              <div class="mini-metric__v">Prototype + results + write-up</div>
-            </div>
-            <div class="mini-metric">
-              <div class="mini-metric__k">Guarantees</div>
-              <div class="mini-metric__v">None (reasonable design)</div>
-            </div>
-
-            <hr class="sep" />
-
-            <div class="quicklinks">
-              <a class="link" href="#experiments">Jump to experiments →</a>
-              <a class="link" href="#repro">Jump to reproducibility →</a>
+            <div class="stat-card">
+              <span class="stat-card__label">Overhead Goal</span>
+              <span class="stat-card__val">&lt; 10%</span>
             </div>
           </div>
         </section>
 
-        <!-- Core claim -->
-        <section class="section" id="claims">
-          <h2>Core claim (what you are testing)</h2>
+        <!-- Logic -->
+        <section id="logic" class="section">
+          <div class="section-header">
+            <span class="section-num">02</span>
+            <h2>The Utility Equation</h2>
+          </div>
+          
+          <p>Current CPUs speculate blindly (High Risk). Static fences kill performance (Low Utility). We introduce a runtime check based on the <strong>Safety Inequality</strong>:</p>
+
+          <div class="math-block">
+            \[ \underbrace{\frac{\pi}{1 - \pi}}_{\text{Hardware Odds}} > \underbrace{\frac{\mathcal{L}}{\mathcal{G}}}_{\text{Software Cost}} \]
+          </div>
+
           <div class="grid grid--2">
             <div class="card">
-              <h3>Hypothesis</h3>
-              <p>
-                A runtime policy that permits speculation only when the <em>expected utility</em> is positive
-                can reduce exploitable leakage in high-risk regions while preserving most performance in low-risk regions.
-              </p>
-              <div class="callout callout--warn">
-                <strong>Important:</strong> results depend on the evaluation platform, workload selection, and leakage proxy quality.
-              </div>
+              <h3>Hardware Inputs (Dynamic)</h3>
+              <ul class="var-list">
+                <li><code class="var">π</code> : <strong>Confidence</strong> (from Branch Predictor).</li>
+                <li><code class="var">G</code> : <strong>Gain</strong> (Cycles saved, e.g., Cache Hit/Miss status).</li>
+              </ul>
             </div>
-
             <div class="card">
-              <h3>Decision rule (math)</h3>
-              <p class="muted">Rendered using KaTeX (optional).</p>
-              <div class="math">
-                \(E[U(I_t)] = \pi(t)\cdot G(I_t) - (1-\pi(t))\cdot L(I_t)\)
-              </div>
-              <div class="math">
-                Continue iff \( \pi(t)G(I_t) > (1-\pi(t))L(I_t) \)
-              </div>
-              <p class="muted">
-                \(\pi(t)\): confidence, \(G\): gain estimate, \(L\): leakage cost (semantic / analysis-derived).
-              </p>
+              <h3>Software Inputs (Static)</h3>
+              <ul class="var-list">
+                <li><code class="var">L</code> : <strong>Leakage Capacity</strong> (Bits/cycle via Compiler).</li>
+                <li><code class="var">Threshold</code> : Tunable policy knob.</li>
+              </ul>
             </div>
           </div>
         </section>
 
-        <!-- Methodology -->
-        <section class="section" id="method">
-          <h2>Proposed methodology</h2>
-
-          <div class="grid grid--3">
-            <div class="card">
-              <div class="pill">Step 1</div>
-              <h3>Define leakage-cost levels</h3>
-              <p>
-                Use a small discrete set (e.g., 2–4 levels: low/med/high/critical) based on
-                program semantics (secret-dependent loads, transmitter gadgets, etc.).
-              </p>
-              <ul class="list">
-                <li>Start coarse (thesis-feasible).</li>
-                <li>Refine later if time permits.</li>
-              </ul>
-            </div>
-
-            <div class="card">
-              <div class="pill">Step 2</div>
-              <h3>Map predictor state → confidence bins</h3>
-              <p>
-                Approximate \(\pi(t)\) from predictor metadata (e.g., saturating counters).
-                Calibration can be simple and monotonic.
-              </p>
-              <ul class="list">
-                <li>No need for perfect probability.</li>
-                <li>Just consistent confidence ordering.</li>
-              </ul>
-            </div>
-
-            <div class="card">
-              <div class="pill">Step 3</div>
-              <h3>Enforce the inequality cheaply</h3>
-              <p>
-                Avoid division. Use LUT/quantization or log-domain comparison in a small “ODU” unit.
-              </p>
-              <ul class="list">
-                <li>Output: speculate / clamp / stall.</li>
-                <li>Goal: minimal critical-path impact.</li>
-              </ul>
-            </div>
+        <!-- Architecture -->
+        <section id="architecture" class="section">
+          <div class="section-header">
+            <span class="section-num">03</span>
+            <h2>Architecture (ODU)</h2>
           </div>
+          <p>
+            The <strong>Optimal Decision Unit</strong> sits in the Fetch stage. To avoid latency on the critical path, we avoid division by using Log-Domain Arithmetic and Lookup Tables (LUTs).
+          </p>
 
-          <div class="card">
-            <h3>System sketch (diagram)</h3>
-            <p class="muted">Mermaid diagram (optional). If Mermaid doesn’t render, it will still display as text.</p>
-
+          <div class="diagram-container">
             <pre class="mermaid">
 flowchart LR
-  A[Compiler / Annotator] -->|L(It) metadata| B[Binary / ISA]
-  B --> C[CPU Front-end]
-  C --> D[ODU: odds decision unit]
-  D -->|speculate| E[Continue fetch]
-  D -->|clamp/stall| F[Limit speculation depth]
-  C -->|predictor state| D
+    BP[Branch Predictor] -->|Confidence π| ODU
+    Cache[Cache Status] -->|Gain G| ODU
+    Decode[Instruction Tags] -->|Leakage L| ODU
+    
+    subgraph ODU [Optimal Decision Unit]
+      Logic{"Log(π) - Log(1-π) > Log(L) - Log(G)"}
+    end
+
+    ODU -->|Pass| Ex[Execute]
+    ODU -->|Fail| Stall[Stall/Clamp]
             </pre>
           </div>
         </section>
 
-        <!-- Design -->
-        <section class="section" id="design">
-          <h2>Implementation design (what you will build)</h2>
-
-          <div class="grid grid--2">
-            <div class="card">
-              <h3>Prototype target (choose one)</h3>
-              <ul class="list">
-                <li><strong>Simulator-based</strong> (recommended for master’s): implement policy in a CPU simulator model.</li>
-                <li><strong>Analytical model</strong>: trace-driven evaluation with leakage/performance proxies.</li>
-                <li><strong>FPGA/RTL</strong> (only if already available): tiny ODU + hooks.</li>
-              </ul>
-              <div class="callout callout--note">
-                For a 5-page proposal, state one main target and keep others as “future work”.
-              </div>
-            </div>
-
-            <div class="card">
-              <h3>Repository layout (suggested)</h3>
-              <pre class="codeblock"><code>/
-  docs/                # this website (optional if you use /docs for pages)
-  src/
-    policy/            # utility rule, thresholds, LUTs
-    workloads/         # microbenchmarks / gadgets
-    metrics/           # leakage proxy + perf analysis
-  scripts/
-    run_all.sh         # reproducible pipeline
-  results/
-    figures/ tables/
-  README.md</code></pre>
-            </div>
+        <!-- Setup -->
+        <section id="setup" class="section">
+          <div class="section-header">
+            <span class="section-num">04</span>
+            <h2>Experimental Setup</h2>
           </div>
+          
+          <p>We validate the framework using <strong>gem5</strong> (Cycle-accurate simulator) comparing three baselines.</p>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Configuration</th>
+                <th>Security</th>
+                <th>Performance</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code class="tag tag--red">Unsafe</code></td>
+                <td>Vulnerable</td>
+                <td>100% (Baseline)</td>
+                <td>Standard Out-of-Order execution.</td>
+              </tr>
+              <tr>
+                <td><code class="tag tag--yellow">Fences</code></td>
+                <td>Secure</td>
+                <td>~60%</td>
+                <td><code>LFENCE</code> inserted before every load.</td>
+              </tr>
+              <tr>
+                <td><code class="tag tag--green">ODU (Thesis)</code></td>
+                <td>Secure</td>
+                <td>Target >90%</td>
+                <td>Dynamic clamping based on risk.</td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
-        <!-- Experiments -->
-        <section class="section" id="experiments">
-          <h2>Planned experiments</h2>
-
-          <div class="toolbar">
-            <div class="toolbar__left">
-              <span class="muted">Filter:</span>
-              <button class="btn btn--chip is-active" data-filter="all" type="button">All</button>
-              <button class="btn btn--chip" data-filter="planned" type="button">Planned</button>
-              <button class="btn btn--chip" data-filter="wip" type="button">In progress</button>
-              <button class="btn btn--chip" data-filter="done" type="button">Completed</button>
-            </div>
-            <div class="toolbar__right muted">
-              Keep experiments “reasonable” — no guarantees.
-            </div>
+        <!-- Validation Code -->
+        <section id="validation" class="section">
+          <div class="section-header">
+            <span class="section-num">05</span>
+            <h2>Validation Methodology</h2>
           </div>
+          <p>
+            Following the methodology of <em>Kocher et al. (Spectre)</em> and <em>Lipp et al. (Meltdown)</em>, we utilize a secret-dependent gadget to measure leakage rates.
+          </p>
 
-          <div class="grid grid--2" id="expGrid">
-            <article class="card exp" data-status="planned">
-              <div class="exp__head">
-                <span class="badge badge--planned">Planned</span>
-                <h3>Exp 1 — Baseline vs policy: perf overhead</h3>
-              </div>
-              <p>Compare default speculation vs utility-controlled speculation on representative workloads.</p>
-              <ul class="list">
-                <li>Independent variables: thresholding, L-level granularity</li>
-                <li>Outputs: IPC, cycles, branch MPKI (if available)</li>
-              </ul>
-            </article>
-
-            <article class="card exp" data-status="planned">
-              <div class="exp__head">
-                <span class="badge badge--planned">Planned</span>
-                <h3>Exp 2 — Leakage proxy reduction on microbenchmarks</h3>
-              </div>
-              <p>Use Spectre-like gadgets / secret-dependent access patterns and measure a leakage proxy.</p>
-              <ul class="list">
-                <li>Proxy examples: distinguishability / success rate in a simplified attacker model</li>
-                <li>Outputs: “leakage score” vs slowdown tradeoff</li>
-              </ul>
-            </article>
-
-            <article class="card exp" data-status="planned">
-              <div class="exp__head">
-                <span class="badge badge--planned">Planned</span>
-                <h3>Exp 3 — Sensitivity: mapping π(t) bins</h3>
-              </div>
-              <p>Check robustness to different confidence mappings (coarse vs fine bins).</p>
-              <ul class="list">
-                <li>Does behavior stay stable?</li>
-                <li>Where does it over-stall?</li>
-              </ul>
-            </article>
-
-            <article class="card exp" data-status="planned">
-              <div class="exp__head">
-                <span class="badge badge--planned">Planned</span>
-                <h3>Exp 4 — Ablation: static cap vs adaptive policy</h3>
-              </div>
-              <p>Compare to a simple fixed speculation-depth cap baseline.</p>
-              <ul class="list">
-                <li>Goal: show Pareto improvement (less leakage for same perf, or vice versa)</li>
-              </ul>
-            </article>
-          </div>
-
-          <div class="callout callout--note">
-            <strong>Tip:</strong> In your 5-page proposal, include only 2–3 “main experiments”. Keep the rest on this page.
-          </div>
-        </section>
-
-        <!-- Metrics -->
-        <section class="section" id="metrics">
-          <h2>Metrics & analysis</h2>
-
-          <div class="grid grid--2">
-            <div class="card">
-              <h3>Performance metrics</h3>
-              <ul class="list">
-                <li>Slowdown / IPC / CPI</li>
-                <li>Branch misprediction rate (if available)</li>
-                <li>Stall frequency due to policy</li>
-              </ul>
+          <!-- Tabbed Code Interface -->
+          <div class="code-tabs">
+            <div class="tabs-header">
+              <button class="tab-btn active" onclick="openTab(event, 'c1')">Victim Gadget (Spectre V1)</button>
+              <button class="tab-btn" onclick="openTab(event, 'c2')">gem5 Implementation (C++)</button>
+              <button class="tab-btn" onclick="openTab(event, 'c3')">Attack / Measure (C)</button>
             </div>
 
-            <div class="card">
-              <h3>Security / leakage proxies</h3>
-              <ul class="list">
-                <li>Distinguishability between secret classes</li>
-                <li>Attacker success rate in simplified model</li>
-                <li>Information-flow inspired scores (where feasible)</li>
-              </ul>
-              <p class="muted">
-                These are proxies: useful for comparison, not absolute guarantees.
-              </p>
-            </div>
-          </div>
-        </section>
+            <!-- Tab 1: The Victim -->
+            <div id="c1" class="tab-content active">
+              <pre><code class="language-c">
+// The classic Spectre V1 gadget (Listing 1 from paper)
+// The ODU must detect the risk here and STALL execution.
 
-        <!-- Reproducibility -->
-        <section class="section" id="repro">
-          <h2>Reproducibility</h2>
-
-          <div class="grid grid--2">
-            <div class="card">
-              <h3>One-command pipeline (goal)</h3>
-              <pre class="codeblock"><code># Example (you will replace with your real command)
-./scripts/run_all.sh --workloads "microbench,spec-lite" --policy utility</code></pre>
-              <ul class="list">
-                <li>Deterministic seeds where possible</li>
-                <li>Results saved to <code>results/</code></li>
-              </ul>
+void victim_function(size_t x) {
+    if (x < array1_size) {
+        // ODU Analysis:
+        // 1. Branch Predictor: Low Confidence (π) due to mistraining
+        // 2. Load array2: High Latency (Cache Miss) -> High Gain (G)
+        // 3. Instruction: Dependent Load -> High Leakage (L)
+        // RESULT: π*G < (1-π)*L  ==> STALL
+        
+        temp &= array2[array1[x] * 512];
+    }
+}
+              </code></pre>
             </div>
 
-            <div class="card">
-              <h3>Environment capture</h3>
-              <ul class="list">
-                <li><code>requirements.txt</code> / <code>environment.yml</code></li>
-                <li>Container (optional): <code>Dockerfile</code></li>
-                <li>Document CPU/simulator version + flags</li>
-              </ul>
+            <!-- Tab 2: gem5 Implementation -->
+            <div id="c2" class="tab-content">
+              <pre><code class="language-cpp">
+// Pseudocode for ODU logic inside gem5 FetchUnit.cpp
+
+bool FetchUnit::checkRisk(DynInstPtr inst) {
+    // 1. Get Hardware Confidence (0.0 to 1.0)
+    float pi = branchPred->getConfidence(inst->pc);
+
+    // 2. Get Static Leakage Cost (from ISA extension/Annotation)
+    float L = inst->staticInst->getLeakageLevel(); 
+
+    // 3. Estimate Gain (Check if address likely in Cache)
+    float G = cache->isLikelyHit(inst->addr) ? LOW_GAIN : HIGH_GAIN;
+
+    // 4. The Inequality (Log Domain)
+    // odds = log(pi / (1-pi))
+    // cost = log(L / G)
+    
+    if (LUT_odds[pi] > (LUT_leak[L] - LUT_gain[G])) {
+        return true; // Speculate
+    } else {
+        stats.oduStalls++; // Record metric
+        return false; // Stall/Clamp
+    }
+}
+              </code></pre>
+            </div>
+
+            <!-- Tab 3: Measurement -->
+            <div id="c3" class="tab-content">
+              <pre><code class="language-c">
+// Measuring Leakage Rate (Based on Spectre Listing 5)
+// We run this on gem5. 
+// Success = 'results[mix_i]' remains 0 (ODU blocked it).
+
+void measure_leakage() {
+    for (i = 0; i < 256; i++) {
+        // Flush cache line
+        _mm_clflush(&array2[i * 512]);
+    }
+
+    // Call Victim (which ODU should protect)
+    victim_function(malicious_x);
+
+    // Reload and Time
+    for (i = 0; i < 256; i++) {
+        time = __rdtscp(&junk);
+        junk = array2[i * 512]; 
+        delta = __rdtscp(&junk) - time;
+        
+        if (delta <= CACHE_HIT_THRESHOLD) {
+             results[i]++; // LEAK DETECTED
+        }
+    }
+}
+              </code></pre>
             </div>
           </div>
         </section>
 
         <!-- Timeline -->
-        <section class="section" id="timeline">
-          <h2>Timeline</h2>
+        <section id="plan" class="section">
+          <div class="section-header">
+            <span class="section-num">06</span>
+            <h2>Timeline</h2>
+          </div>
           <div class="timeline">
-            <div class="timeline__item">
-              <div class="timeline__when">Week 1–2</div>
-              <div class="timeline__what">Finalize scope, implement policy skeleton, set baseline</div>
+            <div class="timeline-item">
+              <div class="t-date">Weeks 1-2</div>
+              <div class="t-content">Base Setup: gem5 + SPEC2017 + Unsafe Baseline.</div>
             </div>
-            <div class="timeline__item">
-              <div class="timeline__when">Week 3–5</div>
-              <div class="timeline__what">Implement L levels + π bins, run Exp 1–2</div>
+            <div class="timeline-item">
+              <div class="t-date">Weeks 3-5</div>
+              <div class="t-content"><strong>ODU Implementation:</strong> Inject C++ logic into Fetch Unit.</div>
             </div>
-            <div class="timeline__item">
-              <div class="timeline__when">Week 6–8</div>
-              <div class="timeline__what">Sensitivity + ablation (Exp 3–4), prepare figures</div>
+            <div class="timeline-item">
+              <div class="t-date">Weeks 6-8</div>
+              <div class="t-content"><strong>Security Eval:</strong> Run Spectre Gadgets (RQ1).</div>
             </div>
-            <div class="timeline__item">
-              <div class="timeline__when">Final</div>
-              <div class="timeline__what">Write thesis + polish repo + final report</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Risks -->
-        <section class="section" id="risks">
-          <h2>Risks & limitations</h2>
-          <div class="grid grid--2">
-            <div class="card">
-              <h3>Main risks</h3>
-              <ul class="list">
-                <li>L(It) may be coarse → start with bins; evaluate sensitivity</li>
-                <li>π(t) calibration imperfect → use monotonic confidence bins</li>
-                <li>Over-stalling → tune thresholds, show Pareto curves</li>
-              </ul>
-            </div>
-            <div class="card">
-              <h3>Non-goals</h3>
-              <ul class="list">
-                <li>Not a full industrial-grade mitigation</li>
-                <li>Not proving absolute security</li>
-                <li>Not covering every side-channel</li>
-              </ul>
+            <div class="timeline-item">
+              <div class="t-date">Weeks 9-10</div>
+              <div class="t-content"><strong>Perf Eval:</strong> Run SPEC2017 & Pareto Analysis (RQ2).</div>
             </div>
           </div>
         </section>
 
-        <!-- Artifacts -->
-        <section class="section" id="artifacts">
-          <h2>Artifacts</h2>
-          <div class="grid grid--3">
-            <div class="card">
-              <h3>Code</h3>
-              <p>Policy, workloads, metrics, scripts.</p>
-              <a class="btn btn--ghost" href="#" onclick="return false;">Link (add)</a>
-            </div>
-            <div class="card">
-              <h3>Results</h3>
-              <p>Figures, tables, logs.</p>
-              <a class="btn btn--ghost" href="#" onclick="return false;">Link (add)</a>
-            </div>
-            <div class="card">
-              <h3>Docs</h3>
-              <p>How to run, how to reproduce, assumptions.</p>
-              <a class="btn btn--ghost" href="#" onclick="return false;">Link (add)</a>
-            </div>
-          </div>
-        </section>
-
-        <!-- References -->
-        <section class="section" id="refs">
-          <h2>References</h2>
-          <div class="card">
-            <ul class="refs">
-              <li>Spectre & Meltdown foundational papers (add full bib entries)</li>
-              <li>Quantifying information flow (info-theoretic framing)</li>
-              <li>SVF / Metior / other evaluation frameworks (as used)</li>
-            </ul>
-            <p class="muted">Tip: keep this short on the website; link to your BibTeX in the repo.</p>
-          </div>
-        </section>
-
-        <footer class="footer">
-          <p class="muted">
-            © <span id="year"></span> — Project page for thesis planning. No guarantees; designed for transparency and reproducibility.
-          </p>
-        </footer>
       </div>
     </main>
   </div>
