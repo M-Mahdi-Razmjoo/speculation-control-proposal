@@ -55,9 +55,9 @@
         <header class="header">
           <h1>Experimental Design & Artifacts</h1>
           <p class="lead">
-            Technical documentation for the <strong>Risk-Aware Control Framework</strong>. 
-            This page details the implementation of the Optimal Decision Unit (ODU) and the rigorous 
-            testing methodology inspired by <em>Spectre</em>, <em>SVF</em>, and <em>Metior</em>.
+            Technical documentation for the Risk-Aware Control Framework. 
+            This page details the implementation of the ODU and the rigorous 
+            testing methodology.
           </p>
         </header>
 
@@ -70,7 +70,7 @@
           
           <p>
             The core challenge is evaluating the utility equation in a single clock cycle during the Fetch stage. 
-            Direct calculation is too slow. We implement a <strong>Log-Domain Comparator</strong> using Lookup Tables (LUTs).
+            Direct calculation is too slow. We implement a Log-Domain Comparator using Lookup Tables.
           </p>
 
           <div class="math-card">
@@ -84,7 +84,7 @@
             <strong>Why this is feasible:</strong> 
             We do not need precise floating-point math. We pre-compute <code>LUT A</code> (indexed by branch predictor confidence bits) 
             and <code>LUT B</code> (indexed by instruction type and cache hit/miss prediction). 
-            The hardware cost is reduced to a single <strong>integer subtraction and comparison</strong>.
+            The hardware cost is reduced to a single integer subtraction and comparison.
           </div>
         </section>
 
@@ -95,12 +95,12 @@
             <h2>gem5 Implementation Strategy</h2>
           </div>
           <p>
-            We modify the <code>FetchUnit</code> of the <strong>gem5 O3CPU</strong> model. The logic injects a 
-            "micro-architectural stall" (bubble) when risk exceeds utility.
+            We modify the <code>FetchUnit</code> of the gem5 O3CPU model. The logic injects a 
+            micro-architectural stall when risk exceeds utility.
           </p>
 
           <div class="code-block">
-            <div class="code-header">src/cpu/o3/fetch.cc (Proposed Modification)</div>
+            <div class="code-header">src/cpu/o3/fetch.cc</div>
             <pre><code class="language-cpp">
 // In Fetch::fetch(status_change)
 bool Fetch::checkODU(DynInstPtr inst) {
@@ -139,11 +139,11 @@ bool Fetch::checkODU(DynInstPtr inst) {
         <section id="gadgets" class="section">
           <div class="section-head">
             <span class="mono">03</span>
-            <h2>Security Validation (The Attack)</h2>
+            <h2>Security Validation</h2>
           </div>
           <p>
-            To validate security, we must prove that the ODU reduces the <strong>Signal-to-Noise Ratio (SNR)</strong> of a side-channel.
-            We use the standard <em>Spectre Variant 1</em> gadget.
+            To validate security, we must prove that the ODU reduces the SNR of a side-channel.
+            We use the standard Spectre Variant 1 gadget.
           </p>
 
           <div class="tabs">
@@ -209,7 +209,7 @@ void measure_leakage() {
             <h2>Quantification Metrics</h2>
           </div>
           <p>
-            Following <em>Metior</em> and <em>SVF</em>, we do not simply ask "did it leak?". We measure <strong>how much</strong>.
+            Following Metior and SVF, we do not simply ask "did it leak?". We measure how much.
           </p>
 
           <div class="grid">
@@ -243,7 +243,7 @@ void measure_leakage() {
           </div>
           <p>
             To prove the ODU is practical, we must show low overhead on benign code. 
-            We use <strong>SPEC CPU2017</strong> (Integer Speed).
+            We use SPEC CPU2017 (Integer Speed).
           </p>
 
           <div class="code-block">
@@ -278,3 +278,4 @@ done
   </div>
 </body>
 </html>
+
